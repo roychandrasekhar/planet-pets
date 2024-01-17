@@ -19,4 +19,4 @@ source /etc/profile.d/java.sh
 git clone https://github.com/spring-projects/spring-petclinic.git
 cd spring-petclinic
 ./mvnw package
-java -jar target/*.jar
+nohup java -jar target/*.jar > output.log 2>&1 &
