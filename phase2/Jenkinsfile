@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    
+    environment {
+        REPO_URL = 'git@github.com:roychandrasekhar/planet-pets.git'
+        PHASE1_DIR = 'planet-pets/phase1'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Clean the existing directory
+                    dir('planet-pets') {
+                        deleteDir()
+                    }
+            
+                    // Use the existing SSH key from the Jenkins host machine
+                    sh "ssh-agent bash -c 'ssh-add /home/jenkins/.ssh/id_rsa; git clone ${REPO_URL} -b main'"
+                }
+            }
+        }
+        
+        stage('Build Image with Packer') {
+            steps {
+                script {
+                    // Set the Packer binary path
+                    def packerBinary = "${env.PACKER_HOME}/packer"
+
+                    // Navigate to the phase1 directory
+                    dir(PHASE1_DIR) {
+                        // Run Packer build commands
+                        sh "packer init aws-ami.pkr.hcl"
+                        sh "packer fmt aws-ami.pkr.hcl"
+                        sh "packer build aws-ami.pkr.hcl"
+                    }
+                }
+            }
+        }
+    }
+}
