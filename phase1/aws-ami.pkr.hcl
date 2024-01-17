@@ -1,5 +1,3 @@
-# If you have your default VPC available then use it. 
-
 # packer puglin for AWS 
 # https://www.packer.io/plugins/builders/amazon 
 packer {
@@ -11,7 +9,7 @@ packer {
   }
 }
 
-# which ami to use as the base and where to save it
+# Specific AMI for the Base Image
 source "amazon-ebs" "amazon-linux" {
   region        = "us-east-1"
   ami_name      = "custom-ami-{{timestamp}}"
@@ -21,23 +19,23 @@ source "amazon-ebs" "amazon-linux" {
   profile       = "chandrasekhar"
 }
 
-# what to install, configure and file to copy/execute
+# Install build and create AMI
 build {
   name = "hq-packer"
   sources = [
     "source.amazon-ebs.amazon-linux"
   ]
 
-  provisioner "file" {
-    source      = "provisioner.sh"
-    destination = "/tmp/provisioner.sh"
-  }
-
   provisioner "shell" {
-    inline = ["chmod a+x /tmp/provisioner.sh"]
-  }
-
-  provisioner "shell" {
-    inline = ["/bin/bash -x /tmp/provisioner.sh"]
+    inline = [
+      "sudo yum -y update",
+      "sudo yum install git -y",
+      "sudo yum install https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm -y",
+      "sudo yum install https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm -y",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a start",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status",
+      "sudo yum install docker -y",
+      "sudo systemctl start docker"
+    ]
   }
 }
