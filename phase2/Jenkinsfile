@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         REPO_URL = 'git@github.com:roychandrasekhar/planet-pets.git'
-        PHASE1_DIR = 'planet-pets/phase1'
+        PHASE2_DIR = 'planet-pets/phase2'
     }
 
     stages {
@@ -28,7 +28,7 @@ pipeline {
                     def packerBinary = "${env.PACKER_HOME}/packer"
 
                     // Navigate to the phase1 directory
-                    dir(PHASE1_DIR) {
+                    dir(PHASE2_DIR) {
                         // Run Packer build commands
                         sh "packer init aws-ami.pkr.hcl"
                         sh "packer fmt aws-ami.pkr.hcl"
