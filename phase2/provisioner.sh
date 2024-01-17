@@ -7,7 +7,8 @@ sudo yum -y update
 sudo yum install git -y
 
 # Install Java 17
-sudo yum install -y openjdk-17-jdk
+sudo amazon-linux-extras enable java-openjdk17
+sudo yum install -y java-1.17.0-openjdk-devel
 
 git clone https://github.com/spring-projects/spring-petclinic.git
 cd spring-petclinic
